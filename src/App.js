@@ -1,23 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { Loader } from "@progress/kendo-react-indicators";
+
+import "@progress/kendo-theme-default/dist/all.css";
+import "./App.css";
+
+import StateTable from "./components/StateTable";
+import StateFetch from "./services/StateFetch";
 
 function App() {
+  const [data, setData] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(async () => {
+    try {
+      const response = await StateFetch();
+      const data = await response.json();
+      setData(data);
+      setLoading(false);
+    } catch (e) {
+      setData({});
+      setLoading(false);
+    }
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {loading ? (
+        <div className="App-header">
+          <Loader size="large" type="converging-spinner" />
+        </div>
+      ) : (
+        <div className="App-header">
+          <StateTable data={data} />
+        </div>
+      )}
     </div>
   );
 }
